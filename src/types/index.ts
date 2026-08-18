@@ -91,3 +91,114 @@ export interface IAuthUser extends UserWithoutPassword {
 export interface AuthenticatedRequest extends Request {
   user: IAuthUser;
 }
+
+/**
+ * Shape of a persisted product category in the database.
+ * Categories are used to group and filter products.
+ */
+export interface ICategory {
+  _id?: Types.ObjectId | string;
+  /** Unique human-readable category name. */
+  name: string;
+  /** Unique URL-friendly slug derived from the name. */
+  slug: string;
+  /** Optional free-text description of the category. */
+  description?: string;
+  /** Whether the category is visible/active for products. */
+  isActive: boolean;
+  createdAt?: Date;
+  updatedAt?: Date;
+}
+
+/**
+ * Shape of a persisted product brand in the database.
+ * Brands represent the manufacturer/maker of products.
+ */
+export interface IBrand {
+  _id?: Types.ObjectId | string;
+  /** Unique human-readable brand name. */
+  name: string;
+  /** Unique URL-friendly slug derived from the name. */
+  slug: string;
+  /** Optional URL or path to the brand's logo image. */
+  logo?: string;
+  /** Optional free-text description of the brand. */
+  description?: string;
+  /** Whether the brand is visible/active for products. */
+  isActive: boolean;
+  createdAt?: Date;
+  updatedAt?: Date;
+}
+
+export type ProductType = 'b2b' | 'b2c' | 'both';
+
+export interface IBulkPriceTier {
+  _id?: Types.ObjectId | string;
+  /** Minimum quantity that triggers this tier. */
+  quantity: number;
+  /** Per-unit price at this tier. */
+  price: number;
+}
+
+export interface IProductRating {
+  _id?: Types.ObjectId | string;
+  /** User who created the rating. */
+  user?: Types.ObjectId | string | IUser | null;
+  /** Numeric rating, typically 1–5. */
+  rating: number;
+  /** Optional free-text review. */
+  comment?: string;
+  createdAt?: Date;
+}
+
+export interface IProduct {
+  _id?: Types.ObjectId | string;
+  /** Display name of the product. */
+  name: string;
+  /** Unique stock-keeping unit code. */
+  sku: string;
+  /** Marketing / detail description. */
+  description?: string;
+  /** URL-friendly slug derived from the name. */
+  slug: string;
+  /** Reference to the product category. Populates to {@link ICategory}. */
+  category: Types.ObjectId | string | ICategory | null;
+  /** Reference to the product brand. Populates to {@link IBrand}. */
+  brand: Types.ObjectId | string | IBrand | null;
+  /** Base list price before discounts. */
+  basePrice: number;
+  /** Optional reduced price (promotional / sale price). */
+  discountedPrice?: number;
+  /** Computed / stored discount percentage (0-100). */
+  discountPercent?: number;
+  /** Gallery of product image URLs/paths. */
+  images?: string[];
+  /** Flexible attribute bag (size, colour, material, etc.). */
+  attributes?: Record<string, unknown>;
+  /** Available stock quantity. Defaults to 0. */
+  stock: number;
+  /** Whether the product is visible to shoppers. */
+  isActive: boolean;
+  /** User ratings and reviews. */
+  ratings?: Array<{
+  _id: string;
+  user: string | { _id: string; name: string } | null;
+  rating: number;
+  comment?: string;
+  createdAt?: Date;
+}>;
+  /** User who created the product record. */
+  createdBy?: Types.ObjectId | string | IUser;
+  /** Last user who edited the product record. */
+  updatedBy?: Types.ObjectId | string | IUser;
+  /** Sales channel the product is listed for. */
+  type: ProductType;
+  /** Minimum order quantity (B2B only). */
+  moq?: number;
+  /** Tiered bulk pricing (B2B only). */
+  bulkPrices?: IBulkPriceTier[];
+  /** Typical lead time in days (B2B only). */
+  leadTime?: number;
+  createdAt?: Date;
+  updatedAt?: Date;
+}

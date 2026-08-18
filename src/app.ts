@@ -3,6 +3,9 @@ import cors from 'cors';
 import swaggerUi from 'swagger-ui-express';
 import authRouter from './routes/authRoutes';
 import userRouter from './routes/userRoutes';
+import categoryRouter from './routes/categoryRoutes';
+import brandRouter from './routes/brandRoutes';
+import productRouter from './routes/productRoutes';
 import swaggerSpec from './config/swagger';
 import errorHandler from './middleware/errorHandler';
 import { ERROR_CODES, HTTP_STATUS } from './utils/constants';
@@ -16,7 +19,7 @@ import { sendResponse } from './utils/response';
  *   1. CORS pre-flight + headers
  *   2. JSON body parsing (`application/json`)
  *   3. Documentation: Swagger UI served at `/api-docs`, raw spec at `/api-docs.json`
- *   4. Routes:   /api/v1/auth, /api/v1/users
+ *   4. Routes:   /api/v1/auth, /api/v1/users, /api/v1/categories, /api/v1/brands, /api/v1/products
  *   5. 404 catch-all for anything not handled above (standard envelope)
  *   6. Terminal error-handling middleware that normalises every failure
  *      into the standard API response envelope.
@@ -37,6 +40,9 @@ app.get('/api-docs.json', (_req, res) => {
 // --- API routes --------------------------------------------------------------
 app.use('/api/v1/auth', authRouter);
 app.use('/api/v1/users', userRouter);
+app.use('/api/v1/categories', categoryRouter);
+app.use('/api/v1/brands', brandRouter);
+app.use('/api/v1/products', productRouter);
 
 // --- 404 catch-all (must run BEFORE errorHandler) ---------------------------
 app.use((req, res) => {
