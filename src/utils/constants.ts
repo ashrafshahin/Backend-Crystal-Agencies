@@ -43,61 +43,65 @@ export const HTTP_STATUS = {
  * These intentionally stay the same across changes to English messages.
  */
 export const ERROR_CODES = {
-  VALIDATION_ERROR: 'VALIDATION_ERROR...',
-  DUPLICATE_KEY: 'DUPLICATE_KEY...',
-  CAST_ERROR: 'CAST_ERROR...',
-  UNAUTHORIZED: 'UNAUTHORIZED...',
-  FORBIDDEN: 'FORBIDDEN...',
-  NOT_FOUND: 'NOT_FOUND...',
-  INTERNAL_ERROR: 'INTERNAL_ERROR...',
-  INVALID_CREDENTIALS: 'INVALID_CREDENTIALS...',
-  EMAIL_NOT_VERIFIED: 'EMAIL_NOT_VERIFIED...',
-  TOKEN_EXPIRED: 'TOKEN_EXPIRED...',
-  TOKEN_INVALID: 'TOKEN_INVALID...',
+  VALIDATION_ERROR: 'VALIDATION_ERROR',
+  DUPLICATE_KEY: 'DUPLICATE_KEY',
+  CAST_ERROR: 'CAST_ERROR',
+  UNAUTHORIZED: 'UNAUTHORIZED',
+  FORBIDDEN: 'FORBIDDEN',
+  NOT_FOUND: 'NOT_FOUND',
+  INTERNAL_ERROR: 'INTERNAL_ERROR',
+  INVALID_CREDENTIALS: 'INVALID_CREDENTIALS',
+  EMAIL_NOT_VERIFIED: 'EMAIL_NOT_VERIFIED',
+  TOKEN_EXPIRED: 'TOKEN_EXPIRED',
+  TOKEN_INVALID: 'TOKEN_INVALID',
 } as const;
 
 /**
- * Default permission lists assigned to each out-of-the-box role when
- * the system is bootstrapped. Individual permissions can be tweaked later
- * by an admin editing the role document directly.
+ * Default permission lists assigned to each out-of-the-box system role when
+ * the system is bootstrapped. Mirrors the seed definitions written by
+ * `scripts/seedRoles.ts` so TypeScript callers have a compile-time reference
+ * that stays in sync with what the seed script inserts into Mongo.
  *
  * Keys are role names; values are the permission strings that role holds.
+ * The wildcard `"*"` grants every permission (used exclusively by super_admin).
  */
 export const ROLE_PERMISSIONS: Record<string, string[]> = {
-  admin: [
+  super_admin: ['*'],
+  sales_staff: [
+    'users:manage',
     'user:read',
     'user:write',
-    'user:delete',
-    'role:read',
-    'role:write',
-    'role:delete',
     'product:read',
-    'product:write',
-    'product:delete',
     'order:read',
     'order:write',
     'order:delete',
-    'inventory:read',
-    'inventory:write',
-    'payment:read',
-    'payment:write',
     'rfq:read',
     'rfq:write',
     'rfq:delete',
-    'settings:read',
-    'settings:write',
+    'inventory:read',
   ],
-  staff: [
+  inventory_staff: [
+    'product:read',
+    'product:write',
+    'product:delete',
+    'inventory:read',
+    'inventory:write',
+    'order:read',
+  ],
+  support_staff: [
     'user:read',
     'user:write',
+    'order:read',
+    'rfq:read',
+    'rfq:write',
+    'product:read',
+  ],
+  marketing_staff: [
     'product:read',
     'product:write',
     'order:read',
-    'order:write',
-    'inventory:read',
-    'inventory:write',
     'rfq:read',
-    'rfq:write',
+    'user:read',
   ],
   customer: [
     'profile:read',
@@ -110,5 +114,4 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     'cart:read',
     'cart:write',
   ],
-  guest: ['product:read', 'rfq:write'],
 };

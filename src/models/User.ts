@@ -1,4 +1,4 @@
-import { Schema, model, type Document } from 'mongoose';
+import { Schema, model, type HydratedDocument } from 'mongoose';
 import type { IUser } from '../types';
 
 /**
@@ -6,8 +6,31 @@ import type { IUser } from '../types';
  *
  * Use this when you are working with a document returned from a query
  * (e.g. `user.save()`, instance methods) rather than a plain POJO payload.
+ *
+ * Note: Uses `HydratedDocument` (available since Mongoose 7) which is the
+ *        canonical way to express an instance produced by `Model.findById`,
+ *        `Model.findOne`, etc. and correctly carries the generic `_id` type
+ *        used by Mongoose 9+.
  */
-export type UserDocument = IUser & Document;
+export type UserDocument = HydratedDocument<IUser>;
+
+/**
+ * Looser structural shape accepted by helpers like `sanitizeUser`.
+ * Matches both a full `UserDocument` and the return of `.populate('role')`
+ * queries whose TS generics Mongoose 9 widens substantially.
+ */
+export type UserLike = {
+  _id: unknown;
+  name: string;
+  email: string;
+  phone?: string;
+  role: unknown;
+  isVerified: boolean;
+  verificationToken?: string | null;
+  resetToken?: string | null;
+  createdAt?: Date | null;
+  updatedAt?: Date | null;
+};
 
 const userSchema = new Schema<IUser>(
   {
@@ -31,19 +54,19 @@ const userSchema = new Schema<IUser>(
     },
     password: {
       type: String,
-      required: [true, 'Password is required...'],
+      required: [true, 'Password is required'],
       select: false,
       minlength: [8, 'Password must be at least 8 characters long'],
     },
     phone: {
       type: String,
       trim: true,
-      maxlength: [20, 'Phone number cannot exceed 20 characters...'],
+      maxlength: [20, 'Phone number cannot exceed 20 characters'],
     },
     role: {
       type: Schema.Types.ObjectId,
       ref: 'Role',
-      required: [true, 'A user must be assigned a role...'],
+      required: [true, 'A user must be assigned a role'],
     },
     isVerified: {
       type: Boolean,

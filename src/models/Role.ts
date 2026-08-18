@@ -1,13 +1,15 @@
-import { Schema, model, type Document, type Model } from 'mongoose';
+import { Schema, model, type HydratedDocument, type Model } from 'mongoose';
 import type { IRole } from '../types';
 
 /**
  * Leaned document type returned by queries that populate or project the
  * role. Extends the base {@link IRole} interface with the Mongoose
- * Document helpers that callers can rely on when they receive a hydrated
- * instance.
+ * HydratedDocument helpers that callers can rely on when they receive a
+ * hydrated instance.
+ *
+ * Uses `HydratedDocument` for Mongoose 7+/9+ compatibility.
  */
-export type RoleDocument = IRole & Document;
+export type RoleDocument = HydratedDocument<IRole>;
 
 const roleSchema = new Schema<IRole, Model<IRole>, IRole>(
   {

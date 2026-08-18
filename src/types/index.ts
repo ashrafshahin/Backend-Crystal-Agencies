@@ -1,4 +1,5 @@
 import type { Types } from 'mongoose';
+import type { Request } from 'express';
 
 /**
  * Shape of a persisted role in the database.
@@ -67,4 +68,26 @@ export interface RegisterDTO {
 export interface LoginDTO {
   email: string;
   password: string;
+}
+
+/**
+ * View-model populated on `req.user` by the `protect` middleware.
+ *
+ * Always has:
+ *   - the user's identity and safe profile fields
+ *   - the user's role populated (name, description, permissions, isSystem)
+ *   - a flat `permissions` string array for fast `hasPermission` checks
+ */
+export interface IAuthUser extends UserWithoutPassword {
+  role: IRole;
+  /** Denormalised copy of `role.permissions` for convenience. */
+  permissions: string[];
+}
+
+/**
+ * Standard Express.Request extension used across the application.
+ * After `protect` runs, `req.user` is guaranteed to be an {@link IAuthUser}.
+ */
+export interface AuthenticatedRequest extends Request {
+  user: IAuthUser;
 }
