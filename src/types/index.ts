@@ -258,3 +258,32 @@ export interface IInventoryAdjustment {
   createdAt?: Date;
   updatedAt?: Date;
 }
+
+export type AlertType =
+  | 'low-stock'
+  | 'overstock'
+  | 'expiring-soon';
+
+export type AlertStatus =
+  | 'active'
+  | 'resolved';
+
+export interface IStockAlert {
+  _id?: Types.ObjectId | string;
+  /** Reference to the product this alert is about. */
+  productId: Types.ObjectId | string | IProduct;
+  /** What kind of alert this represents. */
+  alertType: AlertType;
+  /** Threshold that was breached (e.g. minimumThreshold or maximumCapacity). */
+  threshold?: number;
+  /** Current value that triggered the alert (e.g. current quantity). */
+  currentValue: number;
+  /** Whether this alert is still actionable. */
+  status: AlertStatus;
+  /** When it was marked resolved. */
+  resolvedAt?: Date | null;
+  /** User who resolved it. */
+  resolvedBy?: Types.ObjectId | string | IUser;
+  createdAt?: Date;
+  updatedAt?: Date;
+}

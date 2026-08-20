@@ -6,6 +6,7 @@ import Product from '../models/Product';
 import { ERROR_CODES, HTTP_STATUS } from '../utils/constants';
 import { newAppError } from '../utils/error';
 import { sendResponse } from '../utils/response';
+import { checkAndCreateAlerts } from '../utils/alertHelper';
 import type {
   AuthenticatedRequest,
   IInventory,
@@ -349,6 +350,12 @@ export async function adjustStock(
         },
       );
 
+      try {
+        await checkAndCreateAlerts(productIdForRef);
+      } catch {
+        // Swallow alert errors — they must not break the primary operation.
+      }
+
       const fresh = await Inventory.findById(created._id)
         .populate<{ productId: IProduct }>('productId')
         .exec();
@@ -405,6 +412,12 @@ export async function adjustStock(
       { _id: productIdForRef },
       { $set: { stock: totalQty } },
     );
+
+    try {
+      await checkAndCreateAlerts(productIdForRef);
+    } catch {
+      // Swallow alert errors — they must not break the primary operation.
+    }
 
     const fresh = await Inventory.findById(workingDoc._id)
       .populate<{ productId: IProduct }>('productId')
@@ -514,6 +527,19 @@ export async function setThreshold(
       workingDoc.minimumThreshold,
     );
     await workingDoc.save();
+
+    const rawProductId = workingDoc.productId as unknown;
+    const productRef =
+      rawProductId &&
+      typeof rawProductId === 'object' &&
+      '_id' in (rawProductId as object)
+        ? String((rawProductId as { _id: Types.ObjectId })._id)
+        : String(rawProductId);
+    try {
+      await checkAndCreateAlerts(productRef);
+    } catch {
+      // Swallow alert errors — they must not break the primary operation.
+    }
 
     const fresh = await Inventory.findById(workingDoc._id)
       .populate<{ productId: IProduct }>('productId')
