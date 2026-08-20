@@ -202,3 +202,59 @@ export interface IProduct {
   createdAt?: Date;
   updatedAt?: Date;
 }
+
+export type InventoryStatus =
+  | 'in-stock'
+  | 'low-stock'
+  | 'out-of-stock'
+  | 'discontinued';
+
+export type AdjustmentType =
+  | 'add'
+  | 'remove'
+  | 'correction'
+  | 'return';
+
+export interface IInventory {
+  _id?: Types.ObjectId | string;
+  /** Reference to the product this inventory row tracks. */
+  productId: Types.ObjectId | string | IProduct;
+  /** Free-text warehouse / bin location label. */
+  warehouseLocation?: string;
+  /** Current on-hand quantity at this location. */
+  quantity: number;
+  /** Raise a low-stock flag when quantity drops to or below this level. */
+  minimumThreshold?: number;
+  /** Maximum allowed quantity for this location (cap). */
+  maximumCapacity?: number;
+  /** Trigger a reorder recommendation at this quantity. */
+  reorderLevel?: number;
+  /** Suggested quantity to reorder when reorderLevel is hit. */
+  reorderQuantity?: number;
+  /** Timestamp of the last restock action. */
+  lastRestocked?: Date | null;
+  /** Optional expiration / best-before date for perishable stock. */
+  expirationDate?: Date | null;
+  /** Current derived status of this inventory row. */
+  status: InventoryStatus;
+  createdAt?: Date;
+  updatedAt?: Date;
+}
+
+export interface IInventoryAdjustment {
+  _id?: Types.ObjectId | string;
+  /** Reference to the product this adjustment applies to. */
+  productId: Types.ObjectId | string | IProduct;
+  /** What kind of change this adjustment represents. */
+  adjustmentType: AdjustmentType;
+  /** Quantity delta applied (always positive; sign is implied by adjustmentType). */
+  quantity: number;
+  /** Free-text reason / description for the adjustment. */
+  reason?: string;
+  /** External reference (order id, PO number, etc.). */
+  reference?: string;
+  /** User who performed the adjustment. */
+  adjustedBy?: Types.ObjectId | string | IUser;
+  createdAt?: Date;
+  updatedAt?: Date;
+}

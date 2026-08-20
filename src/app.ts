@@ -6,6 +6,7 @@ import userRouter from './routes/userRoutes';
 import categoryRouter from './routes/categoryRoutes';
 import brandRouter from './routes/brandRoutes';
 import productRouter from './routes/productRoutes';
+import inventoryRouter from './routes/inventoryRoutes';
 import swaggerSpec from './config/swagger';
 import errorHandler from './middleware/errorHandler';
 import { ERROR_CODES, HTTP_STATUS } from './utils/constants';
@@ -43,6 +44,7 @@ app.use('/api/v1/users', userRouter);
 app.use('/api/v1/categories', categoryRouter);
 app.use('/api/v1/brands', brandRouter);
 app.use('/api/v1/products', productRouter);
+app.use('/api/v1/inventory', inventoryRouter);
 
 // --- 404 catch-all (must run BEFORE errorHandler) ---------------------------
 app.use((req, res) => {
