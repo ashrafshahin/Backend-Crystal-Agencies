@@ -1,0 +1,36 @@
+Cart and Wishlist management
+
+IMPLEMENTATION:
+- Create Wishlist model with unique (userId, productId) index
+- Create Cart model with items array (productId, quantity, addedAt)
+- Implement wishlist controller with 4 functions:
+  * addToWishlist(): add product to wishlist
+  * removeFromWishlist(): remove product from wishlist
+  * getWishlist(): list all wishlist items with product details
+  * isInWishlist(): check if product in wishlist
+- Implement cart controller with 6 functions:
+  * addToCart(): add/update product in cart
+  * removeFromCart(): remove product from cart
+  * getCart(): list items with product details, calculate total price
+  * updateQuantity(): change item quantity
+  * clearCart(): empty cart
+  * validateCart(): check stock availability
+- Create wishlist & cart routes with auth protection
+- All endpoints populate product details in responses
+
+ROUTES:
+GET    /api/v1/wishlist                  - list wishlist items
+POST   /api/v1/wishlist                  - add to wishlist
+DELETE /api/v1/wishlist/:productId       - remove from wishlist
+GET    /api/v1/wishlist/check/:productId - check if in wishlist
+GET    /api/v1/cart                      - get cart
+POST   /api/v1/cart                      - add to cart
+PUT    /api/v1/cart/:productId           - update quantity
+DELETE /api/v1/cart/:productId           - remove from cart
+DELETE /api/v1/cart                      - clear cart
+GET    /api/v1/cart/validate             - validate stock
+
+FIXES:
+- Cast Cart.create() return type as any to bypass populated/unpopulated type mismatch
+- All endpoints include Swagger documentation
+- Standard response envelope on all endpoints"

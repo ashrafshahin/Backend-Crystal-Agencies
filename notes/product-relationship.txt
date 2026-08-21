@@ -1,0 +1,47 @@
+Product Relationship System 
+
+IMPLEMENTATION:
+- Create ProductRelationship model with relationships (complementary, compatible, frequently_bought_together)
+- Implement relationship controller with 6 functions:
+  * getRelatedProducts(): fetch related products by type & score with limit
+  * getAllRelationships(): list all relationships with populated source & related products
+  * createRelationship(): validate both products exist, check uniqueness, prevent self-references
+  * updateRelationship(): update type/score/active status with validation
+  * deleteRelationship(): support soft (deactivate) or hard delete via query param
+  * getRecommendations(): public endpoint for storefront product recommendations
+- Create relationship routes with auth & permission middleware
+- Add RESOURCE_EXISTS error code to ERROR_CODES constant
+- Implement unique compound index: (sourceProductId, relatedProductId, type)
+- Support score-based ranking (0-100) for recommendation weighting
+
+ROUTES:
+GET    /api/v1/relationships/:id              - get related products by type
+GET    /api/v1/relationships                  - list all relationships (protected)
+POST   /api/v1/relationships                  - create relationship (requires products:manage)
+PUT    /api/v1/relationships/:id              - update relationship (requires products:manage)
+DELETE /api/v1/relationships/:id              - soft/hard delete (requires products:manage)
+GET    /api/v1/products/:id/recommendations  - public product recommendations
+
+ERRORS FIXED:
+1. TypeScript type errors (lines 312-313):
+   - Cast payload IDs to string: (body.sourceProductId as string)
+   - Issue: Payload type inference returned {} instead of string
+   
+2. Missing ERROR_CODES constant (line 344):
+   - Added RESOURCE_CODES.RESOURCE_EXISTS to constants.ts
+   - Used for duplicate relationship detection on unique index violation
+   
+3. Schema validator type mismatch (ProductRelationship.ts):
+   - Removed custom validator from relatedProductId field
+   - Reason: Mongoose validator 'this' context type incompatible with field typing
+   - Solution: Validate in controller instead (lines 226-233 check sourceId !== relatedId)
+   
+4. YAML formatting in Swagger JSDoc:
+   - Fixed description formatting to use multiline (|) for nested mappings
+   - Prevented YAMLSemanticError: 'Nested mappings not allowed in compact mappings'
+
+SWAGGER DOCUMENTATION:
+- Comprehensive schemas for relationship types, status, alert models
+- Request/response examples with proper type definitions
+- Validation error details documented for each endpoint
+- Product reference schemas included in relationships"

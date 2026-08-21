@@ -308,3 +308,32 @@ export interface IProductRelationship {
   createdAt?: Date;
   updatedAt?: Date;
 }
+
+export interface IWishlist {
+  _id?: Types.ObjectId | string;
+  /** User who owns the wishlist item. */
+  userId: Types.ObjectId | string | IUser;
+  /** Product being saved. */
+  productId: Types.ObjectId | string | IProduct;
+  createdAt?: Date;
+}
+
+export interface ICartItem {
+  _id?: Types.ObjectId | string;
+  /** Product in the cart line. */
+  productId: Types.ObjectId | string | IProduct;
+  /** Quantity requested (positive integer). */
+  quantity: number;
+  /** When the line was added. */
+  addedAt?: Date;
+}
+
+export interface ICart {
+  _id?: Types.ObjectId | string;
+  /** User who owns the cart. */
+  userId: Types.ObjectId | string | IUser;
+  /** Lines currently in the cart. */
+  items: ICartItem[];
+  createdAt?: Date;
+  updatedAt?: Date;
+}

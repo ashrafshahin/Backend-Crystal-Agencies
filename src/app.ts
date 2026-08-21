@@ -9,6 +9,8 @@ import productRouter from './routes/productRoutes';
 import inventoryRouter from './routes/inventoryRoutes';
 import alertRouter from './routes/alertRoutes';
 import relationshipRouter from './routes/relationshipRoutes';
+import wishlistRouter from './routes/wishlistRoutes';
+import cartRouter from './routes/cartRoutes';
 import swaggerSpec from './config/swagger';
 import errorHandler from './middleware/errorHandler';
 import { ERROR_CODES, HTTP_STATUS } from './utils/constants';
@@ -50,6 +52,8 @@ app.use('/api/v1/inventory', inventoryRouter);
 app.use('/api/v1/alerts', alertRouter);
 app.use('/api/v1/relationships', relationshipRouter);
 app.use('/api/v1', relationshipRouter);
+app.use('/api/v1/wishlist', wishlistRouter);
+app.use('/api/v1/cart', cartRouter);
 
 // --- 404 catch-all (must run BEFORE errorHandler) ---------------------------
 app.use((req, res) => {
