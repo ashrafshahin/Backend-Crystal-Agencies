@@ -1,0 +1,54 @@
+git add .
+git commit -m "feat(inventory): complete inventory management & stock alerts system
+
+INVENTORY MANAGEMENT (task 1):
+- Create Inventory model with stock tracking, warehouse location, thresholds, reorder levels
+- Create InventoryAdjustment model to track all stock changes (add/remove/correction/return)
+- Implement inventory controller with 6 functions:
+  * getInventory(): fetch single inventory record with product details
+  * getAllInventory(): list all inventory with pagination
+  * adjustStock(): add/remove stock, create adjustment record, auto-update product stock
+  * setThreshold(): update min/max thresholds and derive status
+  * getLowStockItems(): filter by low-stock or out-of-stock status
+  * getInventoryHistory(): fetch all adjustments for a product with populated user/product
+- Create inventory routes with auth & permission middleware
+- Auto-update product stock field on inventory changes
+- Derive inventory status based on quantity vs thresholds
+
+STOCK ALERTS & REPORTING (task 2):
+- Create StockAlert model for low-stock, overstock, expiring-soon alerts
+- Implement alert controller with 4 functions:
+  * getActiveAlerts(): list all unresolved alerts, newest first
+  * createAlert(): manually create alert with validation
+  * resolveAlert(): mark alert as resolved by user
+  * getDashboardSummary(): return KPI aggregates (alert counts, inventory value, units, products)
+- Create alert routes with full Swagger documentation
+- Create alertHelper utilities:
+  * checkAndCreateAlerts(): auto-trigger on stock changes
+  * updateProductStatus(): sync product status with inventory levels
+- Integrate alerts into inventory adjustment workflow
+
+FIXES & IMPROVEMENTS:
+- Fix TypeScript type errors: param casting (id as string), payload casting (quantity as number)
+- Improve type safety in projection functions for populated documents
+- Simplified user object handling in adjustedBy/resolvedBy fields
+- Fix YAML formatting in Swagger JSDoc for nested schemas
+- All endpoints include comprehensive Swagger documentation with request/response schemas
+
+ENDPOINTS:
+GET    /api/v1/inventory                  - list all inventory
+GET    /api/v1/inventory/:id              - get specific inventory
+POST   /api/v1/inventory/:id/adjust       - adjust stock levels
+POST   /api/v1/inventory/:id/threshold    - set min/max thresholds
+GET    /api/v1/inventory/low-stock        - filter low-stock items
+GET    /api/v1/inventory/:id/history      - get adjustment history
+GET    /api/v1/alerts                     - list active alerts
+POST   /api/v1/alerts                     - create alert
+PUT    /api/v1/alerts/:id/resolve         - mark alert resolved
+GET    /api/v1/alerts/dashboard           - get dashboard summary
+
+PERMISSIONS:
+- All endpoints require auth (protect middleware)
+- adjust, threshold, create, resolve require 'inventory:update' permission"
+
+git push origin main

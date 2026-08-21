@@ -1,3 +1,5 @@
+import { REFUSED } from "node:dns";
+
 /**
  * Standard envelope used for every API response.
  *
@@ -54,6 +56,8 @@ export const ERROR_CODES = {
   EMAIL_NOT_VERIFIED: 'EMAIL_NOT_VERIFIED',
   TOKEN_EXPIRED: 'TOKEN_EXPIRED',
   TOKEN_INVALID: 'TOKEN_INVALID',
+  RESOURCE_EXISTS: 'RESOURCE_EXISTS',
+  
 } as const;
 
 /**

@@ -287,3 +287,24 @@ export interface IStockAlert {
   createdAt?: Date;
   updatedAt?: Date;
 }
+
+export type RelationshipType =
+  | 'complementary'
+  | 'compatible'
+  | 'frequently_bought_together';
+
+export interface IProductRelationship {
+  _id?: Types.ObjectId | string;
+  /** Source product id. */
+  sourceProductId: Types.ObjectId | string | IProduct;
+  /** Related product id. */
+  relatedProductId: Types.ObjectId | string | IProduct;
+  /** Kind of relationship. */
+  type: RelationshipType;
+  /** Relevance weight 0-100. */
+  score: number;
+  /** Whether this relationship is surfaced to consumers. */
+  isActive: boolean;
+  createdAt?: Date;
+  updatedAt?: Date;
+}
