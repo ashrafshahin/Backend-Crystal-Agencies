@@ -337,3 +337,88 @@ export interface ICart {
   createdAt?: Date;
   updatedAt?: Date;
 }
+
+export type OrderStatus =
+  | 'pending'
+  | 'confirmed'
+  | 'shipped'
+  | 'delivered'
+  | 'cancelled';
+
+export type PaymentStatus =
+  | 'unpaid'
+  | 'paid'
+  | 'failed';
+
+export type PaymentMethod =
+  | 'cod'
+  | 'card'
+  | 'wallet'
+  | 'bank_transfer';
+
+export type ShippingMethod =
+  | 'standard'
+  | 'express'
+  | 'pickup';
+
+export interface IShippingAddress {
+  fullName: string;
+  phone?: string;
+  addressLine1: string;
+  addressLine2?: string;
+  city: string;
+  state?: string;
+  postalCode: string;
+  country: string;
+}
+
+export interface IOrderItem {
+  _id?: Types.ObjectId | string;
+  /** Product snapshot at time of order. */
+  productId: Types.ObjectId | string | IProduct;
+  /** Quantity purchased. */
+  quantity: number;
+  /** Unit price captured at order time. */
+  price: number;
+  /** Name snapshot for display even if product is later deleted. */
+  productName?: string;
+  /** SKU snapshot. */
+  productSku?: string;
+  /** Line subtotal: price * quantity. */
+  subtotal?: number;
+}
+
+export interface IOrder {
+  _id?: Types.ObjectId | string;
+  /** User who placed the order. */
+  userId: Types.ObjectId | string | IUser;
+  /** Human-readable unique order identifier. */
+  orderNumber: string;
+  /** Lines in this order (with price snapshots). */
+  items: IOrderItem[];
+  /** Where the order ships to. */
+  shippingAddress: IShippingAddress;
+  /** Shipping option selected. */
+  shippingMethod: ShippingMethod;
+  /** Fulfillment status. */
+  status: OrderStatus;
+  /** What the user chose to pay with. */
+  paymentMethod: PaymentMethod;
+  /** Payment outcome. */
+  paymentStatus: PaymentStatus;
+  /** Sum of `items[].price * quantity`. */
+  totalAmount: number;
+  /** Discounts applied (flat or promotional). */
+  discount: number;
+  /** Tax amount applied. */
+  tax: number;
+  /** finalAmount = totalAmount - discount + tax. */
+  finalAmount: number;
+  cancelledAt?: Date | null;
+  confirmedAt?: Date | null;
+  shippedAt?: Date | null;
+  deliveredAt?: Date | null;
+  notes?: string;
+  createdAt?: Date;
+  updatedAt?: Date;
+}

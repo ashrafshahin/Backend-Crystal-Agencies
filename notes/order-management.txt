@@ -1,0 +1,85 @@
+Order Management System...
+
+IMPLEMENTATION:
+- Create Order model with comprehensive order tracking:
+  * userId reference, unique orderNumber
+  * items array with product details (productId, quantity, price, subtotal)
+  * shippingAddress embedded document (fullName, phone, address, city, state, postal, country)
+  * shippingMethod enum (standard, express, pickup)
+  * status tracking (pending, confirmed, shipped, delivered, cancelled)
+  * paymentMethod enum (cod, card, wallet, bank_transfer) with default 'cod'
+  * paymentStatus enum (unpaid, paid, failed) with default 'unpaid'
+  * Financial fields: totalAmount, discount, tax, finalAmount
+  * Timestamps: cancelledAt, confirmedAt, shippedAt, deliveredAt
+  * Compound indexes on (userId, createdAt), (status, createdAt)
+
+- Create orderHelper utilities:
+  * generateOrderNumber(): unique auto-incremented order ID
+  * calculateTotals(items, discount?, tax?): compute final amount
+  * validateOrderCart(items): verify stock availability
+
+- Implement orderController with 6 functions:
+  * createOrder(): extract cart items, validate, generate number, calc totals, save, clear cart
+  * getOrder(): fetch single order with populated products & user
+  * getUserOrders(): list all orders for authenticated user (sorted by date desc)
+  * updateOrderStatus(): admin update order status with validation
+  * cancelOrder(): cancel pending orders only
+  * getOrderHistory(): list with filters (status, date range)
+
+- Create orderRoutes with auth & permissions:
+  * POST /api/v1/orders → [protect] → createOrder
+  * GET /api/v1/orders/:id → [protect] → getOrder
+  * GET /api/v1/orders → [protect] → getUserOrders
+  * PUT /api/v1/orders/:id/status → [protect, orders:manage] → updateOrderStatus
+  * PUT /api/v1/orders/:id/cancel → [protect] → cancelOrder
+  * GET /api/v1/orders/history → [protect] → getOrderHistory
+
+SCHEMA DETAILS:
+- OrderItem embedded schema with auto-calculation of subtotal (price × quantity)
+- ShippingAddress embedded schema with validation on all required fields
+- orderNumber: uppercase, unique, max 50 chars
+- Items validation: minimum 1 item required per order
+- Status & payment tracking for admin dashboard
+- Timestamps for order lifecycle (created → confirmed → shipped → delivered)
+
+FIXES & IMPROVEMENTS:
+1. Removed duplicate index on orderNumber:
+   - Kept unique: true in field (auto-creates unique index)
+   - Removed explicit orderSchema.index() call (was creating duplicate)
+   - Resolves Mongoose warning about duplicate indexes
+   
+2. Added default values for B2B/B2C:
+   - shippingMethod: 'standard'
+   - paymentMethod: 'cod' (cash on delivery - common in Bangladesh)
+   - paymentStatus: 'unpaid'
+   - orderStatus: 'pending'
+   
+3. Pre-save hook on orderItem schema:
+   - Auto-calculate subtotal if not provided
+   - Async function (no next() callback)
+   
+4. Comprehensive validation:
+   - Shipping address required with max length constraints
+   - Order items minimum 1 validation
+   - Price/quantity/amounts non-negative
+   - Payment/shipping method enums
+   - Status enums for order lifecycle
+
+PERMISSIONS & SECURITY:
+- All endpoints require authentication (protect middleware)
+- updateOrderStatus requires 'orders:manage' permission (admin only)
+- Users can only view/cancel their own orders
+- Order immutability once paid/shipped
+
+ERROR CODES:
+- PERMISSION_DENIED for non-owner access attempts
+- VALIDATION_ERROR for invalid order data
+- NOT_FOUND for missing orders
+- Standard response envelope on all endpoints
+
+SWAGGER DOCUMENTATION:
+- Comprehensive schemas for Order, OrderItem, ShippingAddress
+- All enum values documented
+- Request/response examples
+- Error responses documented"
+
