@@ -12,6 +12,11 @@ import {
   validateOrderCart,
   type OrderValidationIssue,
 } from '../utils/orderHelper';
+import {
+  fireAndForget,
+  sendOrderConfirmation,
+  sendOrderStatusUpdate,
+} from '../utils/emailService';
 import type {
   AuthenticatedRequest,
   IOrder,
@@ -443,6 +448,16 @@ export async function createOrder(
       .exec();
     const projected = projectOrder((fresh ?? created) as any);
 
+    const authUser = authReq.user;
+    fireAndForget(
+      () =>
+        sendOrderConfirmation((fresh ?? created) as any, {
+          name: authUser.name,
+          email: authUser.email,
+        }),
+      `sendOrderConfirmation order=${projected.orderNumber}`,
+    );
+
     sendResponse(
       res,
       {
@@ -640,6 +655,21 @@ export async function updateOrderStatus(
       .exec();
     const projected = projectOrder((fresh ?? doc) as any);
 
+    const authUser = authReq.user;
+    fireAndForget(
+      () =>
+        sendOrderStatusUpdate(
+          {
+            orderNumber: projected.orderNumber,
+            status: newStatus,
+            updatedAt: new Date(),
+          },
+          { name: authUser.name, email: authUser.email },
+          `Your order #${projected.orderNumber} is now ${newStatus}.`,
+        ),
+      `sendOrderStatusUpdate order=${projected.orderNumber}->${newStatus}`,
+    );
+
     sendResponse(
       res,
       { order: projected },
@@ -709,6 +739,21 @@ export async function cancelOrder(
       )
       .exec();
     const projected = projectOrder((fresh ?? doc) as any);
+
+    const authUser = authReq.user;
+    fireAndForget(
+      () =>
+        sendOrderStatusUpdate(
+          {
+            orderNumber: projected.orderNumber,
+            status: 'cancelled',
+            updatedAt: cast.cancelledAt,
+          },
+          { name: authUser.name, email: authUser.email },
+          `Your order #${projected.orderNumber} has been cancelled.`,
+        ),
+      `sendOrderStatusUpdate order=${projected.orderNumber}->cancelled`,
+    );
 
     sendResponse(
       res,

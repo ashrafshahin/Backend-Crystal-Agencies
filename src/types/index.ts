@@ -529,3 +529,19 @@ export interface IQuotation {
   createdAt?: Date;
   updatedAt?: Date;
 }
+
+export interface IEmailTemplate {
+  _id?: Types.ObjectId | string;
+  /** Unique template identifier used at send-time (e.g. "order-confirmation"). */
+  name: string;
+  /** Email subject line — supports {{variable}} placeholders. */
+  subject: string;
+  /** HTML body — supports {{variable}} placeholders from `variables`. */
+  body: string;
+  /** List of accepted / documented variable names accepted by this template. */
+  variables: string[];
+  /** Whether the template is active; inactive ones fall back to built-in HTML. */
+  isActive: boolean;
+  createdAt?: Date;
+  updatedAt?: Date;
+}

@@ -13,6 +13,10 @@ import {
 } from '../utils/auth';
 import { ERROR_CODES, HTTP_STATUS } from '../utils/constants';
 import { sendVerificationEmail, sendResetEmail } from '../utils/email';
+import {
+  sendVerificationEmailAsync,
+  sendPasswordResetAsync,
+} from '../utils/emailService';
 import { newAppError } from '../utils/error';
 import { sendResponse } from '../utils/response';
 
@@ -139,7 +143,23 @@ export async function register(
       isVerified: false,
     });
 
-    sendVerificationEmail(created.email, verificationToken);
+    await sendVerificationEmail(created.email, verificationToken);
+
+    // #region debug-point H2:pre-async-email
+    (()=>{const fs=require('fs'),p='.dbg/verification-email-not-received.env';let u='http://127.0.0.1:7778/event',s='verification-email-not-received';try{const e=fs.readFileSync(p,'utf8');u=e.match(/DEBUG_SERVER_URL=(.+)/)?.[1]||u;s=e.match(/DEBUG_SESSION_ID=(.+)/)?.[1]||s}catch{}fetch(u,{method:'POST',body:JSON.stringify({sessionId:s,runId:'pre',hypothesisId:'H2',location:'authController.ts:register:pre-async-email',msg:'[DEBUG] H2 about to call sendVerificationEmailAsync in register()',data:{userId:String(created._id),userEmail:created.email,userName:created.name,verificationTokenLen:verificationToken?.length||0,appUrlEnv:process.env.APP_URL||'',clientUrlEnv:process.env.CLIENT_URL||'',portEnv:process.env.PORT||''},ts:Date.now()})}).catch(()=>{})})();
+    // #endregion
+
+    const appBaseUrl = process.env.APP_URL ?? process.env.CLIENT_URL ?? `http://localhost:${process.env.PORT ?? '5000'}`;
+    const verificationLink = `${appBaseUrl}/verify-email?token=${encodeURIComponent(verificationToken)}`;
+
+    // #region debug-point H4:link-built
+    (()=>{const fs=require('fs'),p='.dbg/verification-email-not-received.env';let u='http://127.0.0.1:7778/event',s='verification-email-not-received';try{const e=fs.readFileSync(p,'utf8');u=e.match(/DEBUG_SERVER_URL=(.+)/)?.[1]||u;s=e.match(/DEBUG_SESSION_ID=(.+)/)?.[1]||s}catch{}fetch(u,{method:'POST',body:JSON.stringify({sessionId:s,runId:'pre',hypothesisId:'H4',location:'authController.ts:register:link-built',msg:'[DEBUG] H4 verification link built',data:{appBaseUrl,verificationLinkLen:verificationLink.length,verificationLink},ts:Date.now()})}).catch(()=>{})})();
+    // #endregion
+
+    sendVerificationEmailAsync(
+      { name: created.name, email: created.email },
+      verificationLink,
+    );
 
     const sanitized = await sanitizeUser(created as unknown as UserLike);
     const tokens = generateTokens(
@@ -300,6 +320,13 @@ export async function forgotPassword(
       user.resetToken = resetToken;
       await user.save();
       sendResetEmail(user.email, resetToken);
+
+      const appBaseUrl = process.env.APP_URL ?? process.env.CLIENT_URL ?? `http://localhost:${process.env.PORT ?? '5000'}`;
+      const resetLink = `${appBaseUrl}/reset-password?token=${encodeURIComponent(resetToken)}`;
+      sendPasswordResetAsync(
+        { name: user.name, email: user.email },
+        resetLink,
+      );
     }
     // Always respond the same — do not leak whether an account exists.
     sendResponse(

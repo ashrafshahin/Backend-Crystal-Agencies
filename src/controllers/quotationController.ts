@@ -17,6 +17,10 @@ import {
 import { sendQuotationEmail } from '../utils/email';
 import { ensureUniqueOrderNumber } from '../utils/orderHelper';
 import { generateQuotationPDF } from '../utils/pdfGenerator';
+import {
+  fireAndForget,
+  sendQuotationSent,
+} from '../utils/emailService';
 import type {
   AuthenticatedRequest,
   IOrder,
@@ -905,6 +909,24 @@ export async function sendQuotation(
       )
       .exec();
     const projected = projectQuotation((fresh ?? doc) as any);
+
+    fireAndForget(
+      () =>
+        sendQuotationSent(
+          {
+            quotationNumber: projected.quotationNumber,
+            validUntil: projected.validUntil,
+            totalAmount: projected.totalAmount,
+            tax: projected.tax,
+            finalAmount: projected.finalAmount,
+            notes: projected.notes,
+            items: projected.items,
+            rfqNumber,
+          },
+          { name: buyerCast.name, email: buyerCast.email },
+        ),
+      `sendQuotationSent quotation=${projected.quotationNumber}`,
+    );
 
     sendResponse(
       res,

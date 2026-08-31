@@ -1,0 +1,53 @@
+IMPLEMENTATION:
+- Create RFQ model with items array (productId, quantity, notes)
+- Create Quotation model with items array (productId, quantity, unitPrice, discount, subtotal)
+- Implement RFQ controller with 4 functions:
+  * createRFQ(): create request for quote
+  * getRFQ(): fetch RFQ with populated products
+  * getUserRFQs(): list all user RFQs
+  * updateRFQStatus(): update RFQ status
+- Implement Quotation controller with 7 functions:
+  * createQuotation(): auto-calc totals, tax, discount
+  * getQuotation(): fetch quotation
+  * listQuotations(): all quotes for RFQ
+  * updateQuotation(): update items & prices
+  * sendQuotation(): email to user
+  * acceptQuotation(): convert to order
+  * rejectQuotation(): mark rejected
+- Create RFQ & Quotation routes with auth & permissions
+- Auto-generate unique rfqNumber & quotationNumber
+- Calculate subtotals, totals, tax on quotation items
+- Async pre-save hooks for calculations
+- Removed duplicate schema indexes
+
+ROUTES:
+POST   /api/v1/rfq              - create RFQ
+GET    /api/v1/rfq/:id          - get RFQ
+GET    /api/v1/rfq              - list user RFQs
+PUT    /api/v1/rfq/:id/status   - update status
+POST   /api/v1/quotations       - create quotation
+GET    /api/v1/quotations/:id   - get quotation
+GET    /api/v1/quotations       - list quotations
+PUT    /api/v1/quotations/:id   - update quotation
+PUT    /api/v1/quotations/:id/send   - send via email
+PUT    /api/v1/quotations/:id/accept - accept & convert to order
+PUT    /api/v1/quotations/:id/reject - reject quotation
+
+FIXES:
+- Fixed async pre-save hooks (removed next() callback)
+- Cast body fields to string type (notes, attachmentUrl)
+- Removed duplicate indexes (unique: true auto-creates index)
+- All indexes follow compound pattern for query optimization"
+
+
+Quotation download work 
+
+- Create pdfGenerator utility with quotation PDF layout
+- Header: company name, quotation number, date
+- Quotation details: RFQ reference, customer, validity
+- Items table: product, quantity, unit price, discount, subtotal
+- Totals: subtotal, tax, final amount
+- Footer: payment terms, notes
+- Add downloadQuotationPDF() endpoint
+- Set proper headers for PDF download
+- Error handling for missing quotations"
