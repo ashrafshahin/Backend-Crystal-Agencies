@@ -7,7 +7,8 @@
     "dev": "nodemon --exec ts-node src/server.ts",
     "build": "tsc",
     "start": "ts-node src/server.ts",
-    "seed": "ts-node scripts/seedRoles.ts"
+    "seed": "ts-node scripts/seedRoles.ts",
+    "seed:pages": "ts-node scripts/seedPages.ts"
   },
   "keywords": [],
   "author": "",

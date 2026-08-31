@@ -573,3 +573,25 @@ export interface IReview {
   createdAt?: Date;
   updatedAt?: Date;
 }
+
+export interface IPage {
+  _id?: Types.ObjectId | string;
+  /** URL-safe unique slug (e.g. "about", "privacy"). */
+  slug: string;
+  /** Human-readable page title. */
+  title: string;
+  /** Rich text / HTML body content. */
+  content: string;
+  /** SEO meta description. */
+  metaDescription?: string;
+  /** SEO meta keywords (comma-separated or list-as-string. */
+  metaKeywords?: string;
+  /** Whether the page is live and visible to the public. */
+  published: boolean;
+  /** When the page was last published. */
+  publishedAt?: Date | null;
+  /** Last user who edited the page. */
+  updatedBy?: Types.ObjectId | string | IUser;
+  createdAt?: Date;
+  updatedAt?: Date;
+}
