@@ -8,6 +8,7 @@ import {
   sendQuotation,
   acceptQuotation,
   rejectQuotation,
+  downloadQuotationPDF,
 } from '../controllers/quotationController';
 
 const quotationRouter = Router();
@@ -231,6 +232,35 @@ quotationRouter.put('/:id/accept', acceptQuotation);
  *       404: { description: "Quotation not found" }
  */
 quotationRouter.put('/:id/reject', rejectQuotation);
+
+/**
+ * @swagger
+ * /api/v1/quotations/{id}/download-pdf:
+ *   get:
+ *     tags: [Quotations]
+ *     summary: Download a quotation as a PDF file (requires auth)
+ *     description: "Generates and streams a PDF document for the quotation. Accessible by the buyer (userId) or the creator (createdBy). Filename is quotation-{number}.pdf."
+ *     security: [{ bearerAuth: [] }]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: Quotation ObjectId
+ *         schema: { type: string }
+ *     responses:
+ *       200:
+ *         description: PDF file attachment
+ *         content:
+ *           application/pdf:
+ *             schema:
+ *               type: string
+ *               format: binary
+ *       401: { description: "Missing / invalid bearer token" }
+ *       403: { description: Not a participant in this quotation }
+ *       404: { description: "Quotation not found" }
+ *       500: { description: "PDF generation error" }
+ */
+quotationRouter.get('/:id/download-pdf', downloadQuotationPDF);
 
 /**
  * @swagger

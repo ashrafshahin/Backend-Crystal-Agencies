@@ -16,6 +16,7 @@ import {
 } from '../utils/quotationHelper';
 import { sendQuotationEmail } from '../utils/email';
 import { ensureUniqueOrderNumber } from '../utils/orderHelper';
+import { generateQuotationPDF } from '../utils/pdfGenerator';
 import type {
   AuthenticatedRequest,
   IOrder,
@@ -1301,6 +1302,95 @@ export async function rejectQuotation(
     return;
   } catch (err) {
     if (err instanceof Error.CastError) return next(err);
+    return next(err);
+  }
+}
+
+export async function downloadQuotationPDF(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
+  try {
+    const authReq = req as AuthenticatedRequest;
+    const userId = String(authReq.user._id);
+    const { id } = req.params;
+
+    const doc = await Quotation.findById(id)
+      .populate<{ items: Array<{ productId: IProduct } & IQuotationItem> }>(
+        'items.productId',
+      )
+      .exec();
+    if (!doc) {
+      return next(
+        newAppError(
+          'Quotation not found.',
+          HTTP_STATUS.NOT_FOUND,
+          ERROR_CODES.NOT_FOUND,
+        ),
+      );
+    }
+
+    if (String(doc.userId) !== userId && String(doc.createdBy) !== userId) {
+      return next(
+        newAppError(
+          'You are not authorized to download this quotation.',
+          HTTP_STATUS.FORBIDDEN,
+          ERROR_CODES.PERMISSION_DENIED,
+        ),
+      );
+    }
+
+    let rfq: {
+      companyName?: string;
+      contactPerson?: string;
+      email?: string;
+      phone?: string;
+      deliveryLocation?: string;
+      rfqNumber?: string;
+    } | null = null;
+    if (doc.rfqId) {
+      const found = await RFQ.findById(doc.rfqId)
+        .select(
+          'companyName contactPerson email phone deliveryLocation rfqNumber',
+        )
+        .exec();
+      if (found) {
+        rfq = {
+          companyName: found.companyName,
+          contactPerson: found.contactPerson,
+          email: found.email,
+          phone: found.phone,
+          deliveryLocation: found.deliveryLocation,
+          rfqNumber: found.rfqNumber,
+        };
+      }
+    }
+
+    const products: Array<unknown> = doc.items.map((i) => (i as any).productId);
+
+    const buffer = await generateQuotationPDF(
+      doc as unknown as IQuotation & { _id: unknown },
+      products,
+      rfq,
+    );
+
+    const safeNumber = (doc.quotationNumber || 'quotation').replace(
+      /[^A-Za-z0-9_-]/g,
+      '_',
+    );
+    const filename = `quotation-${safeNumber}.pdf`;
+
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader(
+      'Content-Disposition',
+      `attachment; filename="${filename}"`,
+    );
+    res.setHeader('Content-Length', buffer.length);
+
+    res.status(HTTP_STATUS.OK).send(buffer);
+    return;
+  } catch (err) {
     return next(err);
   }
 }
