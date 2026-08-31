@@ -1,0 +1,33 @@
+IMPLEMENTATION:
+- Create scripts/seedAdmin.ts using seedRoles.ts pattern
+- Connect to MongoDB
+- Find super_admin role by name
+- Check if admin email exists (skip if found)
+- Create User with super_admin role:
+  * name: Crystal Agencies Admin
+  * email: admin@crystalagencies.com
+  * password: hashed
+  * isVerified: true
+  * role: super_admin ObjectId
+- Log created admin credentials
+- Disconnect from MongoDB
+
+PACKAGE.JSON:
+- Add script: npm run seed:admin
+
+IDEMPOTENT:
+- Safe to run multiple times
+- Skips if admin already exists
+- No duplicate creation
+
+USAGE:
+npm run seed:admin
+→ Creates first admin user if not exists
+→ Output: admin email & password for login
+→ Admin can now login: POST /api/v1/auth/login
+
+TESTING:
+✅ Script runs without errors
+✅ Detects existing admins
+✅ Outputs admin credentials
+✅ Ready for deployment"
