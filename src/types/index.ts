@@ -199,6 +199,10 @@ export interface IProduct {
   bulkPrices?: IBulkPriceTier[];
   /** Typical lead time in days (B2B only). */
   leadTime?: number;
+  /** Average rating calculated from approved reviews. */
+  avgRating?: number;
+  /** Total count of approved reviews for this product. */
+  totalReviews?: number;
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -542,6 +546,30 @@ export interface IEmailTemplate {
   variables: string[];
   /** Whether the template is active; inactive ones fall back to built-in HTML. */
   isActive: boolean;
+  createdAt?: Date;
+  updatedAt?: Date;
+}
+
+export type ReviewStatus = 'pending' | 'approved' | 'rejected';
+
+export interface IReview {
+  _id?: Types.ObjectId | string;
+  /** Product being reviewed. */
+  productId: Types.ObjectId | string | IProduct;
+  /** User who wrote the review. */
+  userId: Types.ObjectId | string | IUser;
+  /** Numeric rating from 1 to 5. */
+  rating: number;
+  /** Short review title / headline. */
+  title?: string;
+  /** Full review body text. */
+  content?: string;
+  /** How many users marked this review as helpful. */
+  helpful: number;
+  /** Moderation workflow status. */
+  status: ReviewStatus;
+  /** Free-text explanation from moderator when rejected or noted. */
+  moderationNote?: string;
   createdAt?: Date;
   updatedAt?: Date;
 }

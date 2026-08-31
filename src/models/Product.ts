@@ -169,6 +169,17 @@ const productSchema = new Schema<IProduct, Model<IProduct>, IProduct>(
       type: Number,
       min: [0, 'Lead time cannot be negative'],
     },
+    avgRating: {
+      type: Number,
+      min: [0, 'Average rating cannot be negative'],
+      max: [5, 'Average rating cannot exceed 5'],
+      default: 0,
+    },
+    totalReviews: {
+      type: Number,
+      min: [0, 'Total reviews cannot be negative'],
+      default: 0,
+    },
   },
   {
     timestamps: true,

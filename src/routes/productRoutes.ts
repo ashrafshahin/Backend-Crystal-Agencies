@@ -8,6 +8,7 @@ import {
   deleteProduct,
   searchProducts,
 } from '../controllers/productController';
+import { getProductReviews } from '../controllers/reviewController';
 
 const productRouter = Router();
 
@@ -67,6 +68,8 @@ const productRouter = Router();
  *         moq: { type: number, nullable: true, example: 10 }
  *         bulkPrices: { type: array, items: { $ref: '#/components/schemas/BulkPriceTier' } }
  *         leadTime: { type: number, nullable: true, example: 7 }
+ *         avgRating: { type: number, minimum: 0, maximum: 5, example: 4.3, description: "Average rating from approved reviews" }
+ *         totalReviews: { type: integer, minimum: 0, example: 12, description: "Total approved review count" }
  *         createdAt: { type: string, format: date-time }
  *         updatedAt: { type: string, format: date-time }
  *     ProductBody:
@@ -232,6 +235,40 @@ productRouter.get('/', getAllProducts);
  *       200: { description: Search results with category+brand populated }
  */
 productRouter.get('/search', searchProducts);
+
+/**
+ * @swagger
+ * /api/v1/products/{id}/reviews:
+ *   get:
+ *     tags: [Reviews]
+ *     summary: Get all approved reviews for a product (public)
+ *     description: Returns approved reviews sorted by helpful count descending, then newest.
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: Product ObjectId
+ *         schema: { type: string }
+ *     responses:
+ *       200:
+ *         description: List of approved product reviews
+ *         content:
+ *           application/json:
+ *             schema:
+ *               allOf:
+ *                 - $ref: '#/components/schemas/SuccessEnvelope'
+ *                 - type: object
+ *                   properties:
+ *                     data:
+ *                       type: object
+ *                       properties:
+ *                         items:
+ *                           type: array
+ *                           items: { $ref: '#/components/schemas/Review' }
+ *                         count: { type: integer }
+ *       400: { description: Invalid ObjectId format }
+ */
+productRouter.get('/:id/reviews', getProductReviews);
 
 /**
  * @swagger

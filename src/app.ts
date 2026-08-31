@@ -14,6 +14,7 @@ import cartRouter from './routes/cartRoutes';
 import orderRouter from './routes/orderRoutes';
 import rfqRouter from './routes/rfqRoutes';
 import quotationRouter from './routes/quotationRoutes';
+import reviewRouter from './routes/reviewRoutes';
 import swaggerSpec from './config/swagger';
 import errorHandler from './middleware/errorHandler';
 import { ERROR_CODES, HTTP_STATUS } from './utils/constants';
@@ -60,6 +61,7 @@ app.use('/api/v1/cart', cartRouter);
 app.use('/api/v1/orders', orderRouter);
 app.use('/api/v1/rfqs', rfqRouter);
 app.use('/api/v1/quotations', quotationRouter);
+app.use('/api/v1', reviewRouter);
 
 // --- 404 catch-all (must run BEFORE errorHandler) ---------------------------
 app.use((req, res) => {
