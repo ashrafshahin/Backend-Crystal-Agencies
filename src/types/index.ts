@@ -422,3 +422,110 @@ export interface IOrder {
   createdAt?: Date;
   updatedAt?: Date;
 }
+
+export type RFQStatus =
+  | 'pending'
+  | 'quoted'
+  | 'accepted'
+  | 'rejected'
+  | 'expired';
+
+export interface IRFQItem {
+  _id?: Types.ObjectId | string;
+  /** Product being requested. */
+  productId: Types.ObjectId | string | IProduct;
+  /** Quantity requested. */
+  quantity: number;
+  /** Optional per-line notes (packaging, colour, etc.). */
+  notes?: string;
+}
+
+export interface IRFQ {
+  _id?: Types.ObjectId | string;
+  /** User (typically buyer) who created the RFQ. */
+  userId: Types.ObjectId | string | IUser;
+  /** Human-readable unique RFQ identifier. */
+  rfqNumber: string;
+  /** Lines being requested. */
+  items: IRFQItem[];
+  /** Name of the requesting company / organisation. */
+  companyName: string;
+  /** Primary contact person for this RFQ. */
+  contactPerson: string;
+  /** Contact email address. */
+  email: string;
+  /** Contact phone number. */
+  phone?: string;
+  /** Target date the buyer needs the goods by. */
+  requiredDate?: Date | null;
+  /** Free-text delivery location / destination / delivery instructions. */
+  deliveryLocation?: string;
+  /** Any other special handling or requirements. */
+  specialRequirements?: string;
+  /** Lifecycle status of the RFQ. */
+  status: RFQStatus;
+  createdAt?: Date;
+  updatedAt?: Date;
+}
+
+export type QuotationStatus =
+  | 'draft'
+  | 'sent'
+  | 'accepted'
+  | 'rejected';
+
+export interface IQuotationItem {
+  _id?: Types.ObjectId | string;
+  /** Product being quoted. */
+  productId: Types.ObjectId | string | IProduct;
+  /** Quoted quantity. */
+  quantity: number;
+  /** Per-unit quoted price. */
+  unitPrice: number;
+  /** Optional per-line discount (flat amount off this line). */
+  discount?: number;
+  /** Snapshot of product name for display. */
+  productName?: string;
+  /** Snapshot of SKU for display. */
+  productSku?: string;
+  /** Line subtotal: (unitPrice * quantity) - discount (pre-tax). */
+  subtotal?: number;
+}
+
+export interface IQuotation {
+  _id?: Types.ObjectId | string;
+  /** The RFQ this quotation responds to. */
+  rfqId: Types.ObjectId | string | IRFQ;
+  /** The user (buyer) the quotation is addressed to. */
+  userId: Types.ObjectId | string | IUser;
+  /** Human-readable unique quotation identifier. */
+  quotationNumber: string;
+  /** Quotation lines with prices and line discounts. */
+  items: IQuotationItem[];
+  /** Pre-tax total of all lines. */
+  totalAmount: number;
+  /** Tax amount added. */
+  tax: number;
+  /** Grand total: totalAmount + tax. */
+  finalAmount: number;
+  /** Expiry date after which the offer is no longer valid. */
+  validUntil: Date;
+  /** Draft/Sent/Accepted/Rejected workflow status. */
+  status: QuotationStatus;
+  /** Free-text quotation notes / terms and conditions. */
+  notes?: string;
+  /** Optional URL to PDF or document attachment. */
+  attachmentUrl?: string;
+  /** Staff user who created the quotation. */
+  createdBy: Types.ObjectId | string | IUser;
+  /** When the quotation was first emailed/sent. */
+  sentAt?: Date | null;
+  /** When the quotation was accepted. */
+  acceptedAt?: Date | null;
+  /** When the quotation was rejected. */
+  rejectedAt?: Date | null;
+  /** Order generated from accepted quotation. */
+  orderId?: Types.ObjectId | string | IOrder | null;
+  createdAt?: Date;
+  updatedAt?: Date;
+}

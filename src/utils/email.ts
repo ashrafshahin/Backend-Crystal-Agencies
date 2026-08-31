@@ -32,3 +32,43 @@ export function sendResetEmail(email: string, token: string): void {
     `[EMAIL::RESET] Would send email to=${email} resetToken=${token}`,
   );
 }
+
+export interface SendQuotationEmailPayload {
+  quotationNumber: string;
+  buyerEmail: string;
+  buyerName: string;
+  validUntil: Date;
+  finalAmount: number;
+  itemCount: number;
+  rfqNumber?: string;
+  notes?: string;
+}
+
+/**
+ * Simulated sender for quotation-sent notifications.
+ *
+ * Console-only for now (matches the account email utilities above).
+ * Future commit should plug into the real Nodemailer transport.
+ */
+export function sendQuotationEmail(
+  payload: SendQuotationEmailPayload,
+): void {
+  const {
+    quotationNumber,
+    buyerEmail,
+    buyerName,
+    validUntil,
+    finalAmount,
+    itemCount,
+    rfqNumber,
+    notes,
+  } = payload;
+  // eslint-disable-next-line no-console
+  console.log(
+    `[EMAIL::QUOTATION] Would send quotation to=${buyerEmail} (${buyerName}) ` +
+      `quotationNumber=${quotationNumber} ` +
+      `rfqNumber=${rfqNumber ?? 'n/a'} ` +
+      `itemCount=${itemCount} finalAmount=${finalAmount} ` +
+      `validUntil=${validUntil.toISOString()} notes=${notes ?? 'n/a'}`,
+  );
+}
